@@ -7,6 +7,7 @@
 #include <string_view>
 #include <vector>
 #include <cassert>
+#include <openvr.h>
 
 using namespace std::string_view_literals;
 
@@ -57,6 +58,9 @@ using namespace std::string_view_literals;
 
 namespace aurora {
 extern AuroraConfig g_config;
+extern vr::IVRSystem* m_pHMD;
+extern uint32_t m_nRenderWidth;
+extern uint32_t m_nRenderHeight;
 
 struct Module {
   const char* name;

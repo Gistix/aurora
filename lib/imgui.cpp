@@ -13,6 +13,8 @@
 // TODO: Transition back to imgui-provided backend when it uses WGSL
 #include "imgui_impl_wgpu.cpp"                          // NOLINT(bugprone-suspicious-include)
 
+#include <openvr.h>
+
 namespace aurora::imgui {
 static float g_scale;
 static std::string g_imguiSettings{};
@@ -99,6 +101,10 @@ void new_frame(const AuroraWindowSize& size) noexcept {
   ImGui::NewFrame();
 }
 
+#/*ifdef WEBGPU_DAWN
+#include <dawn/native/DawnNative.h>
+#endif*/
+
 void render(const wgpu::RenderPassEncoder& pass) noexcept {
   ImGui::Render();
 
@@ -112,6 +118,36 @@ void render(const wgpu::RenderPassEncoder& pass) noexcept {
     SDL_RenderPresent(renderer);
   } else {
     ImGui_ImplWGPU_RenderDrawData(data, pass.Get());
+
+	// Submit to SteamVR
+    /*vr::VRTextureBounds_t bounds;
+    bounds.uMin = 0.0f;
+    bounds.uMax = 1.0f;
+    bounds.vMin = 0.0f;
+    bounds.vMax = 1.0f;
+
+    WGPUDevice device = aurora::webgpu::g_device.Get();
+    WGPUQueue queue = wgpuDeviceGetQueue(device);
+    
+    aurora::webgpu::g_backendBinding
+
+    vr::VRVulkanTextureData_t vulkanData;
+    vulkanData.m_pDevice = (VkDevice_T*)device;
+    vulkanData.m_pPhysicalDevice = (VkPhysicalDevice_T*)device;
+    vulkanData.m_pInstance = (VkInstance_T*)device;
+    vulkanData.m_pQueue = (VkQueue_T*)queue;
+    vulkanData.m_nQueueFamilyIndex = 0; // todo: query from device class
+
+    vulkanData.m_nWidth = aurora::m_nRenderWidth;
+    vulkanData.m_nHeight = aurora::m_nRenderHeight;
+    vulkanData.m_nFormat = vk::VK_FORMAT_R8G8B8A8_SRGB;
+    vulkanData.m_nSampleCount = 1;
+
+     //vulkanTexture = webgpu::g_swapChain.GetCurrentTextureView();
+
+    vr::Texture_t texture = {&vulkanData, vr::TextureType_Vulkan, vr::ColorSpace_Auto};
+
+    vr::VRCompositor()->Submit(vr::EVREye::Eye_Left, &texture, &bounds);*/
   }
 }
 

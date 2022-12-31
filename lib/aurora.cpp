@@ -9,6 +9,9 @@
 #include <SDL_filesystem.h>
 #include <imgui.h>
 
+#include <openvr.h>
+//#include <vulkan/vulkan.h>
+
 namespace aurora {
 static Module Log("aurora");
 
@@ -18,6 +21,11 @@ AuroraConfig g_config;
 using webgpu::g_device;
 using webgpu::g_queue;
 using webgpu::g_swapChain;
+
+vr::IVRSystem* m_pHMD;
+
+uint32_t m_nRenderWidth;
+uint32_t m_nRenderHeight;
 
 constexpr std::array PreferredBackendOrder{
 #ifdef ENABLE_BACKEND_WEBGPU
@@ -31,6 +39,9 @@ constexpr std::array PreferredBackendOrder{
 #endif
 #ifdef DAWN_ENABLE_BACKEND_VULKAN
     BACKEND_VULKAN,
+#endif
+#ifdef DAWN_ENABLE_BACKEND_OPENVR
+    BACKEND_OPENVR,
 #endif
 #ifdef DAWN_ENABLE_BACKEND_DESKTOP_GL
     BACKEND_OPENGL,
@@ -105,6 +116,29 @@ static AuroraInfo initialize(int argc, char* argv[], const AuroraConfig& config)
   }
   imgui::initialize();
 
+  // Initialize OpenVR
+  vr::EVRInitError eError = vr::VRInitError_None;
+  m_pHMD = vr::VR_Init(&eError, vr::VRApplication_Scene);
+
+  Log.report(LOG_INFO, FMT_STRING("Initializing VR runtime..."));
+
+  if (eError != vr::VRInitError_None) {
+    m_pHMD = NULL;
+    Log.report(LOG_ERROR, FMT_STRING("Unable to init VR runtime: {}"),
+               vr::VR_GetVRInitErrorAsEnglishDescription(eError));
+    // return false;
+  }
+
+  Log.report(LOG_INFO, FMT_STRING("VR runtime ready!"));
+  
+  //Get VkInstance
+  //VkInstance vkInstance = webgpu::g_device.GetAdapter();
+  //VkInstance m_pInstance = (VkInstance*)aurora::webgpu::g_instance;
+  /*uint64_t pHMDPhysicalDevice = 0;
+  m_pHMD->GetOutputDevice(&pHMDPhysicalDevice, vr::TextureType_Vulkan, (VkInstance_T*)m_pInstance);
+
+  m_pHMD->GetRecommendedRenderTargetSize(&m_nRenderWidth, &m_nRenderHeight);*/
+
   if (aurora_begin_frame()) {
     g_initialFrame = true;
   }
@@ -122,6 +156,7 @@ static wgpu::TextureView g_currentView;
 #endif
 
 static void shutdown() noexcept {
+  vr::VR_Shutdown();
 #ifndef EMSCRIPTEN
   g_currentView = {};
 #endif
