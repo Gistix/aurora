@@ -130,6 +130,11 @@ bool create_window(AuroraBackend backend) {
     flags |= SDL_WINDOW_VULKAN;
     break;
 #endif
+#ifdef DAWN_ENABLE_BACKEND_OPENVR
+  case BACKEND_OPENVR:
+    flags |= SDL_WINDOW_VULKAN;
+    break;
+#endif
 #ifdef DAWN_ENABLE_BACKEND_METAL
   case BACKEND_METAL:
     flags |= SDL_WINDOW_METAL;

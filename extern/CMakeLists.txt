@@ -7,7 +7,7 @@ if (NOT EMSCRIPTEN)
       set(DAWN_ENABLE_OPENGLES ON CACHE BOOL "Enable compilation of the OpenGL ES backend" FORCE)
     endif ()
     add_subdirectory(dawn EXCLUDE_FROM_ALL)
-    if (DAWN_ENABLE_VULKAN)
+    if (DAWN_ENABLE_VULKAN OR DAWN_ENABLE_OPENVR)
       target_compile_definitions(dawn_native PRIVATE
           DAWN_ENABLE_VULKAN_VALIDATION_LAYERS
           DAWN_VK_DATA_DIR="vulkandata")

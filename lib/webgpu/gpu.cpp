@@ -323,6 +323,8 @@ static wgpu::BackendType to_wgpu_backend(AuroraBackend backend) {
     return wgpu::BackendType::Metal;
   case BACKEND_VULKAN:
     return wgpu::BackendType::Vulkan;
+  case BACKEND_OPENVR:
+    return wgpu::BackendType::OpenVR;
   case BACKEND_OPENGL:
     return wgpu::BackendType::OpenGL;
   case BACKEND_OPENGLES:

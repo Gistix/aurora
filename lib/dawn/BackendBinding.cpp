@@ -9,6 +9,9 @@
 #if defined(DAWN_ENABLE_BACKEND_VULKAN)
 #include <dawn/native/VulkanBackend.h>
 #endif
+#if defined(DAWN_ENABLE_BACKEND_OPENVR)
+#include <dawn/native/OpenVRBackend.h>
+#endif
 #if defined(DAWN_ENABLE_BACKEND_OPENGL)
 #include <SDL_video.h>
 #include <dawn/native/OpenGLBackend.h>
@@ -33,6 +36,9 @@ BackendBinding* CreateOpenGLBinding(SDL_Window* window, WGPUDevice device);
 #endif
 #if defined(DAWN_ENABLE_BACKEND_VULKAN)
 BackendBinding* CreateVulkanBinding(SDL_Window* window, WGPUDevice device);
+#endif
+#if defined(DAWN_ENABLE_BACKEND_OPENVR)
+BackendBinding* CreateOpenVRBinding(SDL_Window* window, WGPUDevice device);
 #endif
 
 BackendBinding::BackendBinding(SDL_Window* window, WGPUDevice device) : m_window(window), m_device(device) {}
@@ -70,6 +76,12 @@ bool DiscoverAdapter(dawn::native::Instance* instance, SDL_Window* window, wgpu:
 #if defined(DAWN_ENABLE_BACKEND_VULKAN)
   case wgpu::BackendType::Vulkan: {
     dawn::native::vulkan::AdapterDiscoveryOptions options;
+    return instance->DiscoverAdapters(&options);
+  }
+#endif
+#if defined(DAWN_ENABLE_BACKEND_OPENVR)
+  case wgpu::BackendType::OpenVR: {
+    dawn::native::openvr::AdapterDiscoveryOptions options;
     return instance->DiscoverAdapters(&options);
   }
 #endif
@@ -144,6 +156,10 @@ BackendBinding* CreateBinding(wgpu::BackendType type, SDL_Window* window, WGPUDe
 #if defined(DAWN_ENABLE_BACKEND_VULKAN)
   case wgpu::BackendType::Vulkan:
     return CreateVulkanBinding(window, device);
+#endif
+#if defined(DAWN_ENABLE_BACKEND_OPENVR)
+  case wgpu::BackendType::OpenVR:
+    return CreateOpenVRBinding(window, device);
 #endif
   default:
     return nullptr;
